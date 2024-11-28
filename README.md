@@ -109,6 +109,8 @@ make -C nvdsinfer_custom_impl_Yolo clean && make -C nvdsinfer_custom_impl_Yolo
 
 2. Run the DeepStream application:
    ```bash
+   git clone https://github.com/sim-daas/roswithai.git
+   cd roswithai
    deepstream-app -c deepstream_app_config.txt
    ```
 
