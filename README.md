@@ -1,4 +1,4 @@
-# README: Robot Simulation with ROS2, Gazebo, and NVIDIA DeepStream
+# Robot Simulation with ROS2, Gazebo, and NVIDIA DeepStream
 
 This project demonstrates a cutting-edge robot simulation integrating **ROS2**, **Gazebo**, and **NVIDIA DeepStream**. The setup supports advanced tracking and computer vision tasks using **DeepStream** within a ROS2-based control framework. 
 
