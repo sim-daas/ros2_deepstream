@@ -56,3 +56,6 @@ libgstreamer-plugins-base1.0-dev \
 libgstrtspserver-1.0-0 \
 libjansson4 \
 libyaml-cpp-dev -y
+
+# deepstream python apps to samples directory in deepstream 
+RUN cp -r /home/deepstream_python_apps/ /opt/nvidia/deepstream/deepstream/samples/.
