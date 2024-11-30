@@ -1,0 +1,17 @@
+package.xml
+setup.cfg
+setup.py
+../../build/deepros/deepros.egg-info/PKG-INFO
+../../build/deepros/deepros.egg-info/SOURCES.txt
+../../build/deepros/deepros.egg-info/dependency_links.txt
+../../build/deepros/deepros.egg-info/entry_points.txt
+../../build/deepros/deepros.egg-info/requires.txt
+../../build/deepros/deepros.egg-info/top_level.txt
+../../build/deepros/deepros.egg-info/zip-safe
+deepros/__init__.py
+deepros/deepstream_class.py
+deepros/run.py
+resource/deepros
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py

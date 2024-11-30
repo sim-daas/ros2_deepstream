@@ -1,0 +1,6 @@
+source;share/deepros/hook/pythonpath.ps1
+source;share/deepros/hook/pythonpath.dsv
+source;share/deepros/hook/pythonpath.sh
+source;share/deepros/hook/ament_prefix_path.ps1
+source;share/deepros/hook/ament_prefix_path.dsv
+source;share/deepros/hook/ament_prefix_path.sh

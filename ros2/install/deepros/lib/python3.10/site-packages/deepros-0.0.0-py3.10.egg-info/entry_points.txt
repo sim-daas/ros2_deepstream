@@ -1,0 +1,4 @@
+[console_scripts]
+class = deepros.deepstream_class
+detect = deepros.run:main4
+

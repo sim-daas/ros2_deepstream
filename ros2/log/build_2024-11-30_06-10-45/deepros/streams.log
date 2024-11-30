@@ -1,0 +1,23 @@
+[0.419s] Invoking command in '/home/ros/ros2/src/deepros': PYTHONPATH=/home/ros/ros2/build/deepros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ros/ros2/install/deepros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/deepros build --build-base /home/ros/ros2/build/deepros/build install --record /home/ros/ros2/build/deepros/install.log --single-version-externally-managed install_data
+[0.565s] running egg_info
+[0.565s] writing ../../build/deepros/deepros.egg-info/PKG-INFO
+[0.566s] writing dependency_links to ../../build/deepros/deepros.egg-info/dependency_links.txt
+[0.566s] writing entry points to ../../build/deepros/deepros.egg-info/entry_points.txt
+[0.566s] writing requirements to ../../build/deepros/deepros.egg-info/requires.txt
+[0.566s] writing top-level names to ../../build/deepros/deepros.egg-info/top_level.txt
+[0.567s] reading manifest file '../../build/deepros/deepros.egg-info/SOURCES.txt'
+[0.568s] writing manifest file '../../build/deepros/deepros.egg-info/SOURCES.txt'
+[0.568s] running build
+[0.568s] running build_py
+[0.568s] running install
+[0.568s] running install_lib
+[0.569s] running install_data
+[0.569s] copying package.xml -> /home/ros/ros2/install/deepros/share/deepros
+[0.569s] running install_egg_info
+[0.571s] removing '/home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info' (and everything under it)
+[0.571s] Copying ../../build/deepros/deepros.egg-info to /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info
+[0.571s] running install_scripts
+[0.585s] Installing class script to /home/ros/ros2/install/deepros/lib/deepros
+[0.585s] Installing detect script to /home/ros/ros2/install/deepros/lib/deepros
+[0.585s] writing list of installed files to '/home/ros/ros2/build/deepros/install.log'
+[0.600s] Invoked command in '/home/ros/ros2/src/deepros' returned '0': PYTHONPATH=/home/ros/ros2/build/deepros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ros/ros2/install/deepros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/deepros build --build-base /home/ros/ros2/build/deepros/build install --record /home/ros/ros2/build/deepros/install.log --single-version-externally-managed install_data
