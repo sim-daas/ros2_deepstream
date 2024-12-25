@@ -1,0 +1,29 @@
+running egg_info
+writing ../../build/deepros/deepros.egg-info/PKG-INFO
+writing dependency_links to ../../build/deepros/deepros.egg-info/dependency_links.txt
+writing entry points to ../../build/deepros/deepros.egg-info/entry_points.txt
+writing requirements to ../../build/deepros/deepros.egg-info/requires.txt
+writing top-level names to ../../build/deepros/deepros.egg-info/top_level.txt
+reading manifest file '../../build/deepros/deepros.egg-info/SOURCES.txt'
+writing manifest file '../../build/deepros/deepros.egg-info/SOURCES.txt'
+running build
+running build_py
+copying deepros/deepstream_class.py -> /home/ros/ros2/build/deepros/build/lib/deepros
+copying deepros/snode.py -> /home/ros/ros2/build/deepros/build/lib/deepros
+copying deepros/run.py -> /home/ros/ros2/build/deepros/build/lib/deepros
+running install
+running install_lib
+copying /home/ros/ros2/build/deepros/build/lib/deepros/deepstream_class.py -> /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros
+copying /home/ros/ros2/build/deepros/build/lib/deepros/snode.py -> /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros
+copying /home/ros/ros2/build/deepros/build/lib/deepros/run.py -> /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros
+byte-compiling /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/deepstream_class.py to deepstream_class.cpython-310.pyc
+byte-compiling /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/snode.py to snode.cpython-310.pyc
+byte-compiling /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/run.py to run.cpython-310.pyc
+running install_data
+running install_egg_info
+removing '/home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info' (and everything under it)
+Copying ../../build/deepros/deepros.egg-info to /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info
+running install_scripts
+Installing detect script to /home/ros/ros2/install/deepros/lib/deepros
+Installing subs script to /home/ros/ros2/install/deepros/lib/deepros
+writing list of installed files to '/home/ros/ros2/build/deepros/install.log'

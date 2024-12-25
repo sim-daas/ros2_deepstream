@@ -1,8 +1,10 @@
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/__init__.py
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/deepstream_class.py
+/home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/snode.py
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/run.py
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/__pycache__/__init__.cpython-310.pyc
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/__pycache__/deepstream_class.cpython-310.pyc
+/home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/__pycache__/snode.cpython-310.pyc
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros/__pycache__/run.cpython-310.pyc
 /home/ros/ros2/install/deepros/share/ament_index/resource_index/packages/deepros
 /home/ros/ros2/install/deepros/share/deepros/package.xml
@@ -13,5 +15,5 @@
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info/top_level.txt
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info/entry_points.txt
 /home/ros/ros2/install/deepros/lib/python3.10/site-packages/deepros-0.0.0-py3.10.egg-info/requires.txt
-/home/ros/ros2/install/deepros/lib/deepros/class
 /home/ros/ros2/install/deepros/lib/deepros/detect
+/home/ros/ros2/install/deepros/lib/deepros/subs

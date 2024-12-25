@@ -11,6 +11,7 @@ setup.py
 deepros/__init__.py
 deepros/deepstream_class.py
 deepros/run.py
+deepros/snode.py
 resource/deepros
 test/test_copyright.py
 test/test_flake8.py

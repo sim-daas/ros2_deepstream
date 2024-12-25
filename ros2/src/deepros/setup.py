@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'detect = deepros.run:main4',
-            'class = deepros.deepstream_class'
+            'subs = deepros.snode:main'
         ],
     },
 )

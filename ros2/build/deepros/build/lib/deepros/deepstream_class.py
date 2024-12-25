@@ -249,6 +249,7 @@ class NodePipeline(Node):
                     if obj_meta.class_id == 0: 
                         result = str(x1) + ", " + str(x2) + ", " + str(y1) + ", " + str(y2)
                         msg.data = result
+                        print(msg.data)
                         self.publisher_.publish(msg)
           
                 except StopIteration:
