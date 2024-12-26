@@ -4,7 +4,7 @@ This project demonstrates a cutting-edge robot simulation integrating **ROS2**, 
 
 ## **Prerequisites**
 - NVIDIA GPU with CUDA support
-- Docker installed with GPU support
+- Docker installed with GPU support - https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_docker_containers.html
 - Ubuntu 20.04+ recommended
 - Python 3.8 or later
 
