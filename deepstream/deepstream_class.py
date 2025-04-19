@@ -394,10 +394,17 @@ class NodeFilePipeline(Node):
                         result = str(x1) + ", " + str(x2) + ", " + str(y1) + ", " + str(y2)
                         msg.data = result
                         self.publisher_.publish(msg)
-          
+                        
+                    rect_params.border_width = 3
+                    rect_params.border_color.set(1.0, 1.0, 0.0, 1.0)
+
+                    txt_params = obj_meta.text_params
+                    if txt_params:
+                        txt_params.font_params.font_name = "Sans Bold"
+                        
+                         
                 except StopIteration:
                     break
-                obj_meta.rect_params.border_color.set(0.0, 0.0, 1.0, 0.0)
                 try: 
                     l_obj=l_obj.next
                 except StopIteration:
