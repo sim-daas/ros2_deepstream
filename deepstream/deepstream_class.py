@@ -422,11 +422,12 @@ class NodeFilePipeline(Node):
         super().__init__('inference_publisher')
         self.publisher_ = self.create_publisher(String, 'topic', 0)
         Gst.init(None)
-
+        
         self.pipeline = Gst.Pipeline()
-        
-        
+
+        # Elements for MP4 support
         self.source = Gst.ElementFactory.make("filesrc", "file-source")
+        self.demuxer = Gst.ElementFactory.make("qtdemux", "qt-demuxer")
         self.h264parser = Gst.ElementFactory.make("h264parse", "h264-parser")
         self.decoder = Gst.ElementFactory.make("nvv4l2decoder", "nvv4l2-decoder")
         self.streammux = Gst.ElementFactory.make("nvstreammux", "Stream-muxer")
@@ -464,9 +465,9 @@ class NodeFilePipeline(Node):
                 tracker_ll_config_file = config.get('tracker', key)
                 self.tracker.set_property('ll-config-file', tracker_ll_config_file)
 
-
-
+        # Adding elements to the pipeline
         self.pipeline.add(self.source)
+        self.pipeline.add(self.demuxer)
         self.pipeline.add(self.h264parser)
         self.pipeline.add(self.decoder)
         self.pipeline.add(self.streammux)
@@ -476,18 +477,26 @@ class NodeFilePipeline(Node):
         self.pipeline.add(self.nvosd)
         self.pipeline.add(self.sink)
 
+        # Linking elements
+        self.source.link(self.demuxer)
+        self.demuxer.connect("pad-added", self.on_pad_added)
+        self.h264parser.link(self.decoder)
+
         sinkpad = self.streammux.get_request_pad("sink_0")
         srcpad = self.decoder.get_static_pad("src")
 
-        self.source.link(self.h264parser)
-        self.h264parser.link(self.decoder)
         srcpad.link(sinkpad)
         self.streammux.link(self.pgie)
         self.pgie.link(self.tracker)
         self.tracker.link(self.nvvidconv)
         self.nvvidconv.link(self.nvosd)
         self.nvosd.link(self.sink)
-        
+
+    def on_pad_added(self, src, pad):
+        caps = pad.query_caps(None)
+        name = caps.to_string()
+        if name.startswith("video/x-h264"):
+            pad.link(self.h264parser.get_static_pad("sink"))
         self.osdsinkpad = self.nvosd.get_static_pad("sink")
 
         self.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, self.osd_sink_pad_buffer_probe, 0)

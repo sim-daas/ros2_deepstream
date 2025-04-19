@@ -12,6 +12,7 @@ import time
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+import argparse
 
 #GPIO.setmode(GPIO.BOARD)
 #GPIO.setup(12, GPIO.OUT)
@@ -167,13 +168,21 @@ def main4():
     pipeline.run()
     rclpy.shutdown()
     
-def main5():
+def main5(video_file='sample_720p.h264'):
     rclpy.init()
-  #  pipeline = VideoPipeline(args[1])
-    pipeline = NodeFilePipeline('config_inferyolov8.txt', 'sample_720p.h264', 'config_tracker.txt')
-   # pipeline.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
+    pipeline = NodeFilePipeline('config_inferyolov8.txt', video_file, 'config_tracker.txt')
     pipeline.run()
     rclpy.shutdown()
     
 if __name__ == '__main__':
-    main5()
+    
+    parser = argparse.ArgumentParser(description='Run deepstream pipeline with a video file')
+    parser.add_argument('video', nargs='?', type=str, default='sample_720p.h264', 
+                        help='Path to the video file (positional argument)')
+    #parser.add_argument('--video', dest='video_opt', type=str, 
+    #                    help='Path to the video file (optional argument)')
+    args = parser.parse_args()
+    
+    # Use the optional argument if provided, otherwise use the positional argument
+#    video_path = args.video_opt if args.video_opt else args.video
+    main5(args.video)
