@@ -9,7 +9,7 @@ import pyds
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-#from std_msgs.msg import Int64MultiArray
+
 
 def bus_call(bus, message, loop):
     t = message.type
@@ -24,6 +24,159 @@ def bus_call(bus, message, loop):
         sys.stderr.write("Error: %s: %s\n" % (err, debug))
         loop.quit()
     return True
+
+class NodeFilePipeline(Node):
+    def osd_sink_pad_buffer_probe(self, pad,info,u_data):
+        msg = String()
+        gst_buffer = info.get_buffer()
+        batch_meta = pyds.gst_buffer_get_nvds_batch_meta(hash(gst_buffer))
+        l_frame = batch_meta.frame_meta_list
+        while l_frame is not None:
+            try:
+                frame_meta = pyds.NvDsFrameMeta.cast(l_frame.data)
+            except StopIteration:
+                break
+     
+            l_obj=frame_meta.obj_meta_list
+            while l_obj is not None:
+                try:
+                    obj_meta=pyds.NvDsObjectMeta.cast(l_obj.data)
+                    rect_params = obj_meta.rect_params
+                    top = int(rect_params.top)
+                    left = int(rect_params.left)
+                    width = int(rect_params.width)
+                    height = int(rect_params.height)
+
+                    x1 = int(left)
+                    y1 = int(top)
+                    x2 = int(left + width)
+                    y2 = int(top + height)
+                    if obj_meta.class_id == 0: 
+                        result = str(x1) + ", " + str(x2) + ", " + str(y1) + ", " + str(y2)
+                        msg.data = result
+                        self.publisher_.publish(msg)
+                        
+                    rect_params.border_width = 3
+                    rect_params.border_color.set(1.0, 1.0, 0.0, 1.0)
+
+                    txt_params = obj_meta.text_params
+                    if txt_params:
+                        txt_params.font_params.font_name = "Sans Bold"
+                        
+                         
+                except StopIteration:
+                    break
+                try: 
+                    l_obj=l_obj.next
+                except StopIteration:
+                    break
+
+            try:
+                l_frame=l_frame.next
+            except StopIteration:
+                break
+			
+        return Gst.PadProbeReturn.OK
+
+
+    def __init__(self, pgie_config, file_path, tracker_config_path):
+        super().__init__('inference_publisher')
+        self.publisher_ = self.create_publisher(String, 'topic', 0)
+        Gst.init(None)
+        
+        self.pipeline = Gst.Pipeline()
+
+        # Elements for MP4 support
+        self.source = Gst.ElementFactory.make("filesrc", "file-source")
+        self.demuxer = Gst.ElementFactory.make("qtdemux", "qt-demuxer")
+        self.h264parser = Gst.ElementFactory.make("h264parse", "h264-parser")
+        self.decoder = Gst.ElementFactory.make("nvv4l2decoder", "nvv4l2-decoder")
+        self.streammux = Gst.ElementFactory.make("nvstreammux", "Stream-muxer")
+        self.pgie = Gst.ElementFactory.make("nvinfer", "primary-inference")
+        self.tracker = Gst.ElementFactory.make("nvtracker", "tracker")
+        self.nvvidconv = Gst.ElementFactory.make("nvvideoconvert", "convertor")
+        self.nvosd = Gst.ElementFactory.make("nvdsosd", "onscreendisplay")
+        self.sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+
+        self.source.set_property('location', file_path)
+        self.streammux.set_property('width', 1920)
+        self.streammux.set_property('height', 1080)
+        self.streammux.set_property('batch-size', 1)
+        self.streammux.set_property('batched-push-timeout', 4000000)
+        self.pgie.set_property('config-file-path', pgie_config)
+
+        config = configparser.ConfigParser()
+        config.read(tracker_config_path)
+        config.sections()
+
+        for key in config['tracker']:
+            if key == 'tracker-width' :
+                tracker_width = config.getint('tracker', key)
+                self.tracker.set_property('tracker-width', tracker_width)
+            if key == 'tracker-height' :
+                tracker_height = config.getint('tracker', key)
+                self.tracker.set_property('tracker-height', tracker_height)
+            if key == 'gpu-id' :
+                tracker_gpu_id = config.getint('tracker', key)
+                self.tracker.set_property('gpu_id', tracker_gpu_id)
+            if key == 'll-lib-file' :
+                tracker_ll_lib_file = config.get('tracker', key)
+                self.tracker.set_property('ll-lib-file', tracker_ll_lib_file)
+            if key == 'll-config-file' :
+                tracker_ll_config_file = config.get('tracker', key)
+                self.tracker.set_property('ll-config-file', tracker_ll_config_file)
+
+        # Adding elements to the pipeline
+        self.pipeline.add(self.source)
+        self.pipeline.add(self.demuxer)
+        self.pipeline.add(self.h264parser)
+        self.pipeline.add(self.decoder)
+        self.pipeline.add(self.streammux)
+        self.pipeline.add(self.pgie)
+        self.pipeline.add(self.tracker)
+        self.pipeline.add(self.nvvidconv)
+        self.pipeline.add(self.nvosd)
+        self.pipeline.add(self.sink)
+
+        # Linking elements
+        self.source.link(self.demuxer)
+        self.demuxer.connect("pad-added", self.on_pad_added)
+        self.h264parser.link(self.decoder)
+
+        sinkpad = self.streammux.get_request_pad("sink_0")
+        srcpad = self.decoder.get_static_pad("src")
+
+        srcpad.link(sinkpad)
+        self.streammux.link(self.pgie)
+        self.pgie.link(self.tracker)
+        self.tracker.link(self.nvvidconv)
+        self.nvvidconv.link(self.nvosd)
+        self.nvosd.link(self.sink)
+
+    def on_pad_added(self, src, pad):
+        caps = pad.query_caps(None)
+        name = caps.to_string()
+        if name.startswith("video/x-h264"):
+            pad.link(self.h264parser.get_static_pad("sink"))
+        self.osdsinkpad = self.nvosd.get_static_pad("sink")
+
+        self.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, self.osd_sink_pad_buffer_probe, 0)
+
+    def run(self):
+
+        self.pipeline.set_state(Gst.State.PLAYING)
+
+        self.loop = GLib.MainLoop()
+        bus = self.pipeline.get_bus()
+        bus.add_signal_watch()
+        bus.connect ("message", bus_call, self.loop)
+
+        try:
+            self.loop.run()
+        except:
+            pass
+
+        self.pipeline.set_state(Gst.State.NULL)
 
 class Pipeline:
     def __init__(self, file_path, config_file):
@@ -362,160 +515,6 @@ class NodePipeline(Node):
 
 
 
-
-class NodeFilePipeline(Node):
-    def osd_sink_pad_buffer_probe(self, pad,info,u_data):
-        msg = String()
-       # bounding_box = BoundingBox2D()
-        gst_buffer = info.get_buffer()
-        batch_meta = pyds.gst_buffer_get_nvds_batch_meta(hash(gst_buffer))
-        l_frame = batch_meta.frame_meta_list
-        while l_frame is not None:
-            try:
-                frame_meta = pyds.NvDsFrameMeta.cast(l_frame.data)
-            except StopIteration:
-                break
-     
-            l_obj=frame_meta.obj_meta_list
-            while l_obj is not None:
-                try:
-                    obj_meta=pyds.NvDsObjectMeta.cast(l_obj.data)
-                    rect_params = obj_meta.rect_params
-                    top = int(rect_params.top)
-                    left = int(rect_params.left)
-                    width = int(rect_params.width)
-                    height = int(rect_params.height)
-
-                    x1 = int(left)
-                    y1 = int(top)
-                    x2 = int(left + width)
-                    y2 = int(top + height)
-                    if obj_meta.class_id == 0: 
-                        result = str(x1) + ", " + str(x2) + ", " + str(y1) + ", " + str(y2)
-                        msg.data = result
-                        self.publisher_.publish(msg)
-                        
-                    rect_params.border_width = 3
-                    rect_params.border_color.set(1.0, 1.0, 0.0, 1.0)
-
-                    txt_params = obj_meta.text_params
-                    if txt_params:
-                        txt_params.font_params.font_name = "Sans Bold"
-                        
-                         
-                except StopIteration:
-                    break
-                try: 
-                    l_obj=l_obj.next
-                except StopIteration:
-                    break
-
-            try:
-                l_frame=l_frame.next
-            except StopIteration:
-                break
-			
-        return Gst.PadProbeReturn.OK
-
-
-    def __init__(self, pgie_config, file_path, tracker_config_path):
-        super().__init__('inference_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 0)
-        Gst.init(None)
-        
-        self.pipeline = Gst.Pipeline()
-
-        # Elements for MP4 support
-        self.source = Gst.ElementFactory.make("filesrc", "file-source")
-        self.demuxer = Gst.ElementFactory.make("qtdemux", "qt-demuxer")
-        self.h264parser = Gst.ElementFactory.make("h264parse", "h264-parser")
-        self.decoder = Gst.ElementFactory.make("nvv4l2decoder", "nvv4l2-decoder")
-        self.streammux = Gst.ElementFactory.make("nvstreammux", "Stream-muxer")
-        self.pgie = Gst.ElementFactory.make("nvinfer", "primary-inference")
-        self.tracker = Gst.ElementFactory.make("nvtracker", "tracker")
-        self.nvvidconv = Gst.ElementFactory.make("nvvideoconvert", "convertor")
-        self.nvosd = Gst.ElementFactory.make("nvdsosd", "onscreendisplay")
-        self.sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
-
-        self.source.set_property('location', file_path)
-        self.streammux.set_property('width', 1920)
-        self.streammux.set_property('height', 1080)
-        self.streammux.set_property('batch-size', 1)
-        self.streammux.set_property('batched-push-timeout', 4000000)
-        self.pgie.set_property('config-file-path', pgie_config)
-
-        config = configparser.ConfigParser()
-        config.read(tracker_config_path)
-        config.sections()
-
-        for key in config['tracker']:
-            if key == 'tracker-width' :
-                tracker_width = config.getint('tracker', key)
-                self.tracker.set_property('tracker-width', tracker_width)
-            if key == 'tracker-height' :
-                tracker_height = config.getint('tracker', key)
-                self.tracker.set_property('tracker-height', tracker_height)
-            if key == 'gpu-id' :
-                tracker_gpu_id = config.getint('tracker', key)
-                self.tracker.set_property('gpu_id', tracker_gpu_id)
-            if key == 'll-lib-file' :
-                tracker_ll_lib_file = config.get('tracker', key)
-                self.tracker.set_property('ll-lib-file', tracker_ll_lib_file)
-            if key == 'll-config-file' :
-                tracker_ll_config_file = config.get('tracker', key)
-                self.tracker.set_property('ll-config-file', tracker_ll_config_file)
-
-        # Adding elements to the pipeline
-        self.pipeline.add(self.source)
-        self.pipeline.add(self.demuxer)
-        self.pipeline.add(self.h264parser)
-        self.pipeline.add(self.decoder)
-        self.pipeline.add(self.streammux)
-        self.pipeline.add(self.pgie)
-        self.pipeline.add(self.tracker)
-        self.pipeline.add(self.nvvidconv)
-        self.pipeline.add(self.nvosd)
-        self.pipeline.add(self.sink)
-
-        # Linking elements
-        self.source.link(self.demuxer)
-        self.demuxer.connect("pad-added", self.on_pad_added)
-        self.h264parser.link(self.decoder)
-
-        sinkpad = self.streammux.get_request_pad("sink_0")
-        srcpad = self.decoder.get_static_pad("src")
-
-        srcpad.link(sinkpad)
-        self.streammux.link(self.pgie)
-        self.pgie.link(self.tracker)
-        self.tracker.link(self.nvvidconv)
-        self.nvvidconv.link(self.nvosd)
-        self.nvosd.link(self.sink)
-
-    def on_pad_added(self, src, pad):
-        caps = pad.query_caps(None)
-        name = caps.to_string()
-        if name.startswith("video/x-h264"):
-            pad.link(self.h264parser.get_static_pad("sink"))
-        self.osdsinkpad = self.nvosd.get_static_pad("sink")
-
-        self.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, self.osd_sink_pad_buffer_probe, 0)
-
-    def run(self):
-
-        self.pipeline.set_state(Gst.State.PLAYING)
-
-        self.loop = GLib.MainLoop()
-        bus = self.pipeline.get_bus()
-        bus.add_signal_watch()
-        bus.connect ("message", bus_call, self.loop)
-
-        try:
-            self.loop.run()
-        except:
-            pass
-
-        self.pipeline.set_state(Gst.State.NULL)
 
 
 class Pipeline_tracker:

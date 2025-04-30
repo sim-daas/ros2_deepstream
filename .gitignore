@@ -1,2 +1,4 @@
 model_b1_gpu0_fp32.engine
 deepstream/videos
+deepstream/model_b8_gpu0_fp32.engine
+deepstream/__pycache__
