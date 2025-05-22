@@ -75,7 +75,7 @@ def main():
     pipeline.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
     pipeline.run()
 
-def main2():
+def main2(video_file='sample_720p.h264'):
     #pipeline = Pipeline_tracker(args[1], args[2], args[3])
     pipeline = Pipeline_tracker('sample_720p.h264', 'config_inferyolov8.txt', 'config_tracker.txt')
     pipeline.osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
@@ -98,7 +98,7 @@ def main4():
     pipeline.run()
     rclpy.shutdown()
     
-def main5(video_file='sample_720p.h264'):
+def main5(video_file='videos/cars1.mp4'):
     rclpy.init()
     pipeline = NodeFilePipeline('config_inferyolov8.txt', video_file, 'config_tracker.txt')
     pipeline.run()
