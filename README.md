@@ -48,7 +48,7 @@ python3 deepstream_test_1.py ../../../streams/sample_720p.h264
 ---
 
 ## **Install Additional Dependencies**
-Inside the container, run the following commands to set up additional dependencies:
+Inside the container run the following commands to set up additional dependencies:
 
 ### **4. Install CUDA Toolkit**
 ```bash
