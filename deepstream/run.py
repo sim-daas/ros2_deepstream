@@ -100,7 +100,7 @@ def main4():
     
 def main5(video_file='videos/cars1.mp4'):
     rclpy.init()
-    pipeline = NodeFilePipeline('config_inferyolov8.txt', video_file, 'config_tracker.txt')
+    pipeline = NodeFilePipeline('config_infer.txt', video_file, 'config_tracker.txt')
     pipeline.run()
     rclpy.shutdown()
     
