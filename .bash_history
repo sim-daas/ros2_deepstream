@@ -526,3 +526,74 @@ cd ros/deepstream/
 ls
 rm model_b8_gpu0_fp32_yolov8x.engine 
 apt install cuda-toolkit-12-3
+ls
+ros2
+history
+cd
+cp ~/.bash_history /home/ros/.
+cd /home/ros/
+./push.sh 
+history
+ls
+cd ros/
+./push.sh 
+ls
+cd deepstream/
+python3 run.py 
+ls
+python3 run.py 
+python3 run.py videos/cars1.mp4 
+python3 run.py 
+cd ..
+./push.sh 
+mv DeepStream-Yolo/ deepstream/.
+cd deepstream/
+ls
+cd DeepStream-Yolo/
+ls
+mkdir models
+mv yolov8* models/.
+cd ..
+python3 run.py videos/cars1.mp4 
+ls
+cd deepstream/
+python3 run.py videos/cars1.mp4 
+cd DeepStream-Yolo/
+ls
+df -h .
+cd ..
+ls
+cat config_inferyolov8.txt 
+cd DeepStream-Yolo/
+ls
+rm -r model_b8_gpu0_fp32.engine 
+cd ..
+ls
+cp config_inferyolov8.txt config_infer.txt
+nano config_infer
+nano config_infer.txt 
+ls
+python3 run.py videos/cars1.mp4 
+cd ..
+nano .gitignore 
+cd deepstream/
+ls
+cat config_inferyolov8.txt 
+cd ..
+./push.sh 
+cat .gitignore 
+cd deepstream/
+ls
+cat config_inferyolov8.txt 
+ls
+rm -r DeepStream-Yolo/
+cd ..
+ls
+./push.sh 
+cd
+ign gazebo
+cd
+ls
+cd /home/
+cd ros
+./push.sh 
